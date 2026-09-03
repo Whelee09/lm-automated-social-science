@@ -71,6 +71,7 @@ class LanguageModel(RegisteredSerializable):
                 )
             if self.max_tokens is not None:
                 kwargs["max_tokens"] = self.max_tokens
+            kwargs.update(self._provider_kwargs())
             response = openai.ChatCompletion.create(**kwargs)
             return response["choices"][0]["message"]["content"]
         
@@ -126,6 +127,16 @@ class LanguageModel(RegisteredSerializable):
         if os.getenv('LLM_PROVIDER', 'openai').lower() == 'deepseek':
             return os.getenv('DEEPSEEK_MODEL', 'deepseek-v4-flash')
         return self.model
+
+    def _provider_kwargs(self) -> dict:
+        '''Los modelos deepseek-v4-* razonan por defecto: eso multiplica la latencia
+        y los tokens de salida (que se facturan) incluso en respuestas triviales.
+        DEEPSEEK_THINKING=1 lo reactiva si hace falta calidad de razonamiento.'''
+        if os.getenv('LLM_PROVIDER', 'openai').lower() != 'deepseek':
+            return {}
+        if os.getenv('DEEPSEEK_THINKING', '0') == '1':
+            return {}
+        return {"thinking": {"type": "disabled"}}
 
 class LLMMixin:
     def add_LLM(self, LLM: 'LanguageModel') -> None:
