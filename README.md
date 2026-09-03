@@ -185,18 +185,14 @@ The following two sets of files (5. and 6.) will be stored in a subdirectory `an
 Each file is named according to the scenario it pertains to, ensuring organized and accessible output for further analysis.
 
 ## Example to play
-- We have prepared some example structural causal models, the four from the paper, if you would like to rerun the simulated conversations.
-```
-python -m src run-experiment-with-scm "src/Example/3 bidders participating in an auction for a piece of art starting at fifty dollars.json"
-``` 
-```
-python -m src run-experiment-with-scm "src/Example/a judge is setting bail for a criminal defendant who committed 50,000 dollars in tax fraud.json.json"
-``` 
-```
-python -m src run-experiment-with-scm "src/Example/lawyer_interview_3var.json"
-``` 
+- We have prepared one example structural causal model, the mug bargaining scenario from the paper, if you would like to rerun the simulated conversations.
 ```
 python -m src run-experiment-with-scm "src/Example/two people bargaining over a mug.json"
+```
+- The other three scenarios from the paper (the art auction, the bail hearing, and the lawyer interview) have been removed from this fork to keep the workshop focused on a single scenario. They can be recovered from git history if needed.
+- To explore a scenario of your own, `end-to-end` remains fully available:
+```
+python -m src end-to-end "a scenario you are interested in" --n-causes 2
 ```
 
 

@@ -24,8 +24,12 @@ class LanguageModel(RegisteredSerializable):
         self.temperature: float = temperature
         self.max_tokens: int = max_tokens
         self.system_prompt: str = system_prompt
-        openai.organization = os.getenv('ORGANIZATION_ID')
-        openai.api_key = os.getenv('OPENAI_API_KEY')
+        if os.getenv('LLM_PROVIDER', 'openai').lower() == 'deepseek':
+            openai.api_base = 'https://api.deepseek.com/v1'
+            openai.api_key = os.getenv('DEEPSEEK_API_KEY')
+        else:
+            openai.organization = os.getenv('ORGANIZATION_ID')
+            openai.api_key = os.getenv('OPENAI_API_KEY')
 
         self.family_model_mapping = {
             "openai": {
@@ -59,13 +63,15 @@ class LanguageModel(RegisteredSerializable):
     @retry(wait_exponential_multiplier = 1000, wait_exponential_max = 10000, stop_max_attempt_number = 100)
     def call_openai_api_35(self, prompt: str) -> str:        
         try:
-            response = openai.ChatCompletion.create(
-                model = self.model,
+            kwargs = dict(
+                model = self._resolve_model(),
                 messages = [{"role": "system", "content": self.system_prompt},
                             {"role": "user", "content": prompt}],
-                max_tokens = None if self.max_tokens is None else self.max_tokens,
                 temperature = self.temperature
                 )
+            if self.max_tokens is not None:
+                kwargs["max_tokens"] = self.max_tokens
+            response = openai.ChatCompletion.create(**kwargs)
             return response["choices"][0]["message"]["content"]
         
         except openai.error.RateLimitError as e:
@@ -115,7 +121,12 @@ class LanguageModel(RegisteredSerializable):
                     )
         result = ''.join(output)
         return result
-        
+
+    def _resolve_model(self) -> str:
+        if os.getenv('LLM_PROVIDER', 'openai').lower() == 'deepseek':
+            return os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')
+        return self.model
+
 class LLMMixin:
     def add_LLM(self, LLM: 'LanguageModel') -> None:
         self.LLM = LLM
