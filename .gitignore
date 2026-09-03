@@ -1,0 +1,24 @@
+# Claves y secretos
+*.env
+.env
+
+# Entornos virtuales
+myenv/
+myvenv/
+venv/
+.venv/
+
+# Salida de los experimentos (se regenera; borrar entre ejecuciones)
+experiment_logs/
+
+# Referencia de saldo del verificador
+.saldo_snapshot.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+__pycache__/
