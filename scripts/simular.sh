@@ -65,14 +65,20 @@ while kill -0 "$SIM_PID" 2>/dev/null; do
   SEGUNDOS=$((SEGUNDOS + 30))
   MINUTOS=$((SEGUNDOS / 60))
 
-  # Contar simulaciones completadas
+  # Obtener total de simulaciones (el código imprime "There are X simulations in total")
   if [ -f "$LOG" ]; then
-    TERMINADAS=$(grep -c "Ending condition is reached\|Success!" "$LOG" 2>/dev/null || echo "0")
+    TOTAL=$(grep -oP 'There are \K[0-9]+' "$LOG" 2>/dev/null | head -1)
+    TERMINADAS=$(grep -c "Ending condition is reached" "$LOG" 2>/dev/null || echo "0")
   else
+    TOTAL=""
     TERMINADAS=0
   fi
 
-  echo "  ⏳  ${MINUTOS} min transcurridos — ${TERMINADAS} conversaciones completadas..."
+  if [ -n "$TOTAL" ] && [ "$TOTAL" -gt 0 ] 2>/dev/null; then
+    echo "  ⏳  ${MINUTOS} min — ${TERMINADAS} de ${TOTAL} conversaciones completadas..."
+  else
+    echo "  ⏳  ${MINUTOS} min — preparando simulación..."
+  fi
 done
 
 # ── Simulación terminó ───────────────────────────────────
