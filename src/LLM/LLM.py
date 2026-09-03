@@ -124,7 +124,7 @@ class LanguageModel(RegisteredSerializable):
 
     def _resolve_model(self) -> str:
         if os.getenv('LLM_PROVIDER', 'openai').lower() == 'deepseek':
-            return os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')
+            return os.getenv('DEEPSEEK_MODEL', 'deepseek-v4-flash')
         return self.model
 
 class LLMMixin:

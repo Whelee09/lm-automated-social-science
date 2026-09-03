@@ -22,6 +22,7 @@ fi
 if [ ! -f .env ]; then
   echo "LLM_PROVIDER=deepseek" > .env
   echo "DEEPSEEK_API_KEY=PEGAR_TU_KEY_AQUI" >> .env
+  echo "DEEPSEEK_MODEL=deepseek-v4-flash" >> .env
   echo ""
   echo "⚠️  Archivo .env creado con valores por defecto."
   echo "   Edita el archivo .env y pega tu API key de DeepSeek."
