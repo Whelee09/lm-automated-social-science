@@ -18,12 +18,13 @@ sys.path.append('./src/Serialization')
 from Serialize import RegisteredSerializable
 
 class LanguageModel(RegisteredSerializable):
-    def __init__(self, model: str, family: str, temperature: float, max_tokens = None, system_prompt: str = "") -> None:
+    def __init__(self, model: str, family: str, temperature: float, max_tokens = None, system_prompt: str = "", thinking: bool = False) -> None:
         self.model: str = model
         self.family: str = family
         self.temperature: float = temperature
         self.max_tokens: int = max_tokens
         self.system_prompt: str = system_prompt
+        self.thinking: bool = thinking
         if os.getenv('LLM_PROVIDER', 'openai').lower() == 'deepseek':
             openai.api_base = 'https://api.deepseek.com/v1'
             openai.api_key = os.getenv('DEEPSEEK_API_KEY')
@@ -131,12 +132,17 @@ class LanguageModel(RegisteredSerializable):
     def _provider_kwargs(self) -> dict:
         '''Los modelos deepseek-v4-* razonan por defecto: eso multiplica la latencia
         y los tokens de salida (que se facturan) incluso en respuestas triviales.
-        DEEPSEEK_THINKING=1 lo reactiva si hace falta calidad de razonamiento.'''
+        Por eso se apaga salvo que la instancia pida thinking = True, que se reserva
+        para las llamadas de razonamiento causal (pocas y caras de equivocar).
+
+        DEEPSEEK_THINKING fuerza el valor global para toda la ejecucion:
+        "1" lo enciende en todas las llamadas, "0" lo apaga en todas. Sin definir,
+        manda lo que pida cada instancia.'''
         if os.getenv('LLM_PROVIDER', 'openai').lower() != 'deepseek':
             return {}
-        if os.getenv('DEEPSEEK_THINKING', '0') == '1':
-            return {}
-        return {"thinking": {"type": "disabled"}}
+        override = os.getenv('DEEPSEEK_THINKING')
+        enabled = (override == '1') if override is not None else bool(self.thinking)
+        return {} if enabled else {"thinking": {"type": "disabled"}}
 
 class LLMMixin:
     def add_LLM(self, LLM: 'LanguageModel') -> None:

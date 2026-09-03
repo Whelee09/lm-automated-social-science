@@ -81,7 +81,7 @@ def build_agent(scm_json: str,
                 temp_scientist: float = typer.Option(0.3, help="Temperature for the large language model scientist")):
     """Build the agents."""
     typer.echo(f"Building agent from file {scm_json}")
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     
     loaded_scm = StructuralCausalModelBuilder.deserialize(scm_json)
     
@@ -101,7 +101,7 @@ def build_interaction(scm_json: str,
     """Build the interaction type."""
     # typer.echo(f"Building interaction from SCM JSON")
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     
     loaded_scm = StructuralCausalModelBuilder.deserialize(scm_json)
     agent_builder = AgentBuilder(template_dir=templates_dir)
@@ -569,7 +569,7 @@ def get_agents(
     """
     typer.echo(f"Get agent for scenario '{scenario}'")
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who is interested in studying social scenarios.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who is interested in studying social scenarios.')
     JP = JudeaPearl(scenario, template_dir=templates_dir)
     JP.add_LLM(LLM)
     human_agents_list = JP.backend_get_human_agents()
@@ -587,7 +587,7 @@ def get_outcome(
     """
     typer.echo(f"Generating possible outcomes for scenario {scenario}")
 
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are an economist who is interested in studying social scenarios.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are an economist who is interested in studying social scenarios.')
     JP = JudeaPearl(scenario, template_dir=templates_dir)
     JP.add_LLM(LLM)
     outcomes = JP.backend_outcome_generator(count=n_outcomes)
@@ -607,7 +607,7 @@ def build_outcome(
     """
     typer.echo(f"Build the selected outcome {target_outcome} for scenario {scenario}")
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     
     ## Define the scenario and agents
     scenario_description = scenario
@@ -640,7 +640,7 @@ def get_cause(
     """
     typer.echo(f"Get possible causes for given outcome {target_outcome}")
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     
     # Instantiate the SCM
     loaded_scm = StructuralCausalModelBuilder.deserialize(scm_json)
@@ -669,7 +669,7 @@ def build_cause(
     """
     typer.echo(f"Build the selected cause {target_cause} for outcome {target_outcome}")
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     
     loaded_scm = StructuralCausalModelBuilder.deserialize(scm_json)
     loaded_scm.add_LLM(LLM)
@@ -719,7 +719,7 @@ def build_cause_with_scm(
         logging.error("Error decoding SCM JSON.")
         return "JSON Error!"
     typer.echo(f"Build the selected cause {target_cause} for outcome {target_outcome}")
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     output_dir = "experiment_logs"
     ensure_directory(output_dir)
     
@@ -777,7 +777,7 @@ def add_line(
         return "JSON Error!"
     typer.echo(f"Add a cause relation between cause {target_cause} and  outcome {target_outcome}")
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, system_prompt='You are a social scientist who loves research and coming up with ideas.')
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True, system_prompt='You are a social scientist who loves research and coming up with ideas.')
     target_outcome = f"'{target_outcome}'"
     
     loaded_scm = StructuralCausalModelBuilder.deserialize(scm)
@@ -858,7 +858,7 @@ def analysis_data(
     # output_dir = "experiment_logs"
     ensure_directory(output_dir)
     
-    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist)
+    LLM = LanguageModel(family="openai", model="gpt-4", temperature=temp_scientist, thinking=True)
 
     try:
         with open(file_path, 'r') as f:
